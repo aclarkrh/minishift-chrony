@@ -1,50 +1,30 @@
 apiVersion: v1
 kind: Template
 metadata:
-  creationTimestamp: null
   name: minishift-chrony
 objects:
 - apiVersion: v1
   kind: ImageStream
   metadata:
-    creationTimestamp: null
-    generation: 1
-    name: docker-mac-chrony
-  spec:
-    lookupPolicy:
-      local: false
-    tags:
-    - annotations: null
-      from:
-        kind: DockerImage
-        name: 172.30.1.1:5000/rhpam/docker-mac-chrony:latest
-      generation: null
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: ""
-  status:
-    dockerImageRepository: ""
+    labels:
+      app: minishift-chrony
+    name: minishift-chrony
 - apiVersion: v1
   kind: BuildConfig
   metadata:
-    creationTimestamp: null
     labels:
-      app: docker-mac-chrony
-    name: docker-mac-chrony-bc
+      app: minishift-chrony
+    name: minishift-chrony
   spec:
-    nodeSelector: null
     output:
       to:
         kind: ImageStreamTag
-        name: docker-mac-chrony:latest
-    postCommit: {}
-    resources: {}
+        name: minishift-chrony:latest
     runPolicy: Serial
     source:
       git:
         ref: master
-        uri: https://github.com/aclarkrh/docker-mac-chrony.git
+        uri: https://github.com/aclarkrh/minishift-chrony.git
       type: Git
     strategy:
       dockerStrategy:
@@ -54,449 +34,18 @@ objects:
           namespace: openshift
       type: Docker
     triggers: []
-  status:
-    lastVersion: 0
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-      template.alpha.openshift.io/wait-for-ready: "true"
-    creationTimestamp: null
-    generation: 1
     labels:
-      app: rhpam71-authoring
-      application: authoring
-      rhpam: "1.1"
-      service: authoring-kieserver
-      template: rhpam71-authoring
-    name: authoring-kieserver
-  spec:
-    replicas: 1
-    revisionHistoryLimit: 10
-    selector:
-      deploymentConfig: authoring-kieserver
-    strategy:
-      activeDeadlineSeconds: 21600
-      recreateParams:
-        timeoutSeconds: 600
-      resources: {}
-      type: Recreate
-    template:
-      metadata:
-        annotations:
-          openshift.io/generated-by: OpenShiftNewApp
-        creationTimestamp: null
-        labels:
-          app: rhpam71-authoring
-          application: authoring
-          deploymentConfig: authoring-kieserver
-          service: authoring-kieserver
-        name: authoring-kieserver
-      spec:
-        containers:
-        - env:
-          - name: DATASOURCES
-            value: RHPAM
-          - name: RHPAM_DATABASE
-            value: rhpam7
-          - name: RHPAM_JNDI
-            value: java:/jboss/datasources/rhpam
-          - name: RHPAM_JTA
-            value: "true"
-          - name: RHPAM_DRIVER
-            value: h2
-          - name: RHPAM_USERNAME
-            value: sa
-          - name: RHPAM_PASSWORD
-            value: sa
-          - name: RHPAM_XA_CONNECTION_PROPERTY_URL
-            value: jdbc:h2:/opt/eap/standalone/data/rhpam
-          - name: RHPAM_SERVICE_HOST
-            value: dummy_ignored
-          - name: RHPAM_SERVICE_PORT
-            value: "12345"
-          - name: KIE_SERVER_PERSISTENCE_DIALECT
-            value: org.hibernate.dialect.H2Dialect
-          - name: DROOLS_SERVER_FILTER_CLASSES
-            value: "true"
-          - name: KIE_ADMIN_USER
-            value: adminUser
-          - name: KIE_ADMIN_PWD
-            value: a
-          - name: KIE_MBEANS
-            value: enabled
-          - name: KIE_SERVER_BYPASS_AUTH_USER
-            value: "false"
-          - name: KIE_SERVER_CONTROLLER_USER
-            value: controllerUser
-          - name: KIE_SERVER_CONTROLLER_PWD
-            value: c
-          - name: KIE_SERVER_CONTROLLER_TOKEN
-          - name: KIE_SERVER_CONTROLLER_SERVICE
-            value: authoring-rhpamcentr
-          - name: KIE_SERVER_CONTROLLER_PROTOCOL
-            value: ws
-          - name: KIE_SERVER_ID
-            value: authoring-kieserver
-          - name: KIE_SERVER_HOST
-          - name: KIE_SERVER_ROUTE_NAME
-            value: authoring-kieserver
-          - name: KIE_SERVER_USE_SECURE_ROUTE_NAME
-            value: "false"
-          - name: KIE_SERVER_PERSISTENCE_DS
-            value: java:/jboss/datasources/rhpam
-          - name: KIE_SERVER_USER
-            value: executionUser
-          - name: KIE_SERVER_PWD
-            value: e
-          - name: MAVEN_REPOS
-            value: RHPAMCENTR,EXTERNAL
-          - name: RHPAMCENTR_MAVEN_REPO_SERVICE
-            value: authoring-rhpamcentr
-          - name: RHPAMCENTR_MAVEN_REPO_PATH
-            value: /maven2/
-          - name: RHPAMCENTR_MAVEN_REPO_USERNAME
-            value: mavenUser
-          - name: RHPAMCENTR_MAVEN_REPO_PASSWORD
-            value: m
-          - name: EXTERNAL_MAVEN_REPO_ID
-          - name: EXTERNAL_MAVEN_REPO_URL
-          - name: EXTERNAL_MAVEN_REPO_USERNAME
-          - name: EXTERNAL_MAVEN_REPO_PASSWORD
-          - name: HTTPS_KEYSTORE_DIR
-            value: /etc/kieserver-secret-volume
-          - name: HTTPS_KEYSTORE
-            value: keystore.jks
-          - name: HTTPS_NAME
-            value: rhpam
-          - name: HTTPS_PASSWORD
-            value: password
-          - name: SSO_URL
-          - name: SSO_OPENIDCONNECT_DEPLOYMENTS
-            value: ROOT.war
-          - name: SSO_REALM
-          - name: SSO_SECRET
-          - name: SSO_CLIENT
-          - name: SSO_USERNAME
-          - name: SSO_PASSWORD
-          - name: SSO_DISABLE_SSL_CERTIFICATE_VALIDATION
-            value: "false"
-          - name: SSO_PRINCIPAL_ATTRIBUTE
-            value: preferred_username
-          - name: HOSTNAME_HTTP
-          - name: HOSTNAME_HTTPS
-          - name: AUTH_LDAP_URL
-          - name: AUTH_LDAP_BIND_DN
-          - name: AUTH_LDAP_BIND_CREDENTIAL
-          - name: AUTH_LDAP_JAAS_SECURITY_DOMAIN
-          - name: AUTH_LDAP_BASE_CTX_DN
-          - name: AUTH_LDAP_BASE_FILTER
-          - name: AUTH_LDAP_SEARCH_SCOPE
-          - name: AUTH_LDAP_SEARCH_TIME_LIMIT
-          - name: AUTH_LDAP_DISTINGUISHED_NAME_ATTRIBUTE
-          - name: AUTH_LDAP_PARSE_USERNAME
-          - name: AUTH_LDAP_USERNAME_BEGIN_STRING
-          - name: AUTH_LDAP_USERNAME_END_STRING
-          - name: AUTH_LDAP_ROLE_ATTRIBUTE_ID
-          - name: AUTH_LDAP_ROLES_CTX_DN
-          - name: AUTH_LDAP_ROLE_FILTER
-          - name: AUTH_LDAP_ROLE_RECURSION
-          - name: AUTH_LDAP_DEFAULT_ROLE
-          - name: AUTH_LDAP_ROLE_NAME_ATTRIBUTE_ID
-          - name: AUTH_LDAP_PARSE_ROLE_NAME_FROM_DN
-          - name: AUTH_LDAP_ROLE_ATTRIBUTE_IS_DN
-          - name: AUTH_LDAP_REFERRAL_USER_ATTRIBUTE_ID_TO_CHECK
-          image: 172.30.1.1:5000/openshift/rhpam71-kieserver-openshift@sha256:e61baf4ffa9285b296d5cecdab47ce9c675931b7284fc86f341bdfe55d5fb833
-          imagePullPolicy: Always
-          livenessProbe:
-            exec:
-              command:
-              - /bin/bash
-              - -c
-              - curl --fail --silent -u 'adminUser:a' http://localhost:8080/services/rest/server/healthcheck
-            failureThreshold: 3
-            initialDelaySeconds: 180
-            periodSeconds: 15
-            successThreshold: 1
-            timeoutSeconds: 2
-          name: authoring-kieserver
-          ports:
-          - containerPort: 8778
-            name: jolokia
-            protocol: TCP
-          - containerPort: 8080
-            name: http
-            protocol: TCP
-          - containerPort: 8443
-            name: https
-            protocol: TCP
-          readinessProbe:
-            exec:
-              command:
-              - /bin/bash
-              - -c
-              - curl --fail --silent -u 'adminUser:a' http://localhost:8080/services/rest/server/readycheck
-            failureThreshold: 6
-            initialDelaySeconds: 60
-            periodSeconds: 30
-            successThreshold: 1
-            timeoutSeconds: 2
-          resources:
-            limits:
-              memory: 1Gi
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /etc/kieserver-secret-volume
-            name: kieserver-keystore-volume
-            readOnly: true
-          - mountPath: /opt/eap/standalone/data
-            name: authoring-h2-pvol
-        dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        schedulerName: default-scheduler
-        securityContext: {}
-        serviceAccount: authoring-rhpamsvc
-        serviceAccountName: authoring-rhpamsvc
-        terminationGracePeriodSeconds: 60
-        volumes:
-        - name: kieserver-keystore-volume
-          secret:
-            defaultMode: 420
-            secretName: kieserver-app-secret
-        - name: authoring-h2-pvol
-          persistentVolumeClaim:
-            claimName: authoring-h2-claim
-    test: false
-    triggers:
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-        - authoring-kieserver
-        from:
-          kind: ImageStreamTag
-          name: rhpam71-kieserver-openshift:1.1
-          namespace: openshift
-      type: ImageChange
-    - type: ConfigChange
-  status:
-    availableReplicas: 0
-    latestVersion: 0
-    observedGeneration: 0
-    replicas: 0
-    unavailableReplicas: 0
-    updatedReplicas: 0
-- apiVersion: v1
-  kind: DeploymentConfig
-  metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-      template.alpha.openshift.io/wait-for-ready: "true"
-    creationTimestamp: null
-    generation: 1
-    labels:
-      app: rhpam71-authoring
-      application: authoring
-      rhpam: "1.1"
-      service: authoring-rhpamcentr
-      template: rhpam71-authoring
-    name: authoring-rhpamcentr
-  spec:
-    replicas: 1
-    revisionHistoryLimit: 10
-    selector:
-      deploymentConfig: authoring-rhpamcentr
-    strategy:
-      activeDeadlineSeconds: 21600
-      recreateParams:
-        timeoutSeconds: 600
-      resources: {}
-      type: Recreate
-    template:
-      metadata:
-        annotations:
-          openshift.io/generated-by: OpenShiftNewApp
-        creationTimestamp: null
-        labels:
-          app: rhpam71-authoring
-          application: authoring
-          deploymentConfig: authoring-rhpamcentr
-          service: authoring-rhpamcentr
-        name: authoring-rhpamcentr
-      spec:
-        containers:
-        - env:
-          - name: KIE_ADMIN_USER
-            value: adminUser
-          - name: KIE_ADMIN_PWD
-            value: a
-          - name: KIE_MBEANS
-            value: enabled
-          - name: KIE_SERVER_CONTROLLER_USER
-            value: controllerUser
-          - name: KIE_SERVER_CONTROLLER_PWD
-            value: c
-          - name: KIE_SERVER_CONTROLLER_TOKEN
-          - name: KIE_SERVER_USER
-            value: executionUser
-          - name: KIE_SERVER_PWD
-            value: e
-          - name: MAVEN_REPO_ID
-          - name: MAVEN_REPO_URL
-          - name: MAVEN_REPO_USERNAME
-          - name: MAVEN_REPO_PASSWORD
-          - name: KIE_MAVEN_USER
-            value: mavenUser
-          - name: KIE_MAVEN_PWD
-            value: m
-          - name: GIT_HOOKS_DIR
-          - name: HTTPS_KEYSTORE_DIR
-            value: /etc/businesscentral-secret-volume
-          - name: HTTPS_KEYSTORE
-            value: keystore.jks
-          - name: HTTPS_NAME
-            value: rhpam
-          - name: HTTPS_PASSWORD
-            value: password
-          - name: WORKBENCH_ROUTE_NAME
-            value: authoring-rhpamcentr
-          - name: SSO_URL
-          - name: SSO_OPENIDCONNECT_DEPLOYMENTS
-            value: ROOT.war
-          - name: SSO_REALM
-          - name: SSO_SECRET
-          - name: SSO_CLIENT
-          - name: SSO_USERNAME
-          - name: SSO_PASSWORD
-          - name: SSO_DISABLE_SSL_CERTIFICATE_VALIDATION
-            value: "false"
-          - name: SSO_PRINCIPAL_ATTRIBUTE
-            value: preferred_username
-          - name: HOSTNAME_HTTP
-          - name: HOSTNAME_HTTPS
-          - name: AUTH_LDAP_URL
-          - name: AUTH_LDAP_BIND_DN
-          - name: AUTH_LDAP_BIND_CREDENTIAL
-          - name: AUTH_LDAP_JAAS_SECURITY_DOMAIN
-          - name: AUTH_LDAP_BASE_CTX_DN
-          - name: AUTH_LDAP_BASE_FILTER
-          - name: AUTH_LDAP_SEARCH_SCOPE
-          - name: AUTH_LDAP_SEARCH_TIME_LIMIT
-          - name: AUTH_LDAP_DISTINGUISHED_NAME_ATTRIBUTE
-          - name: AUTH_LDAP_PARSE_USERNAME
-          - name: AUTH_LDAP_USERNAME_BEGIN_STRING
-          - name: AUTH_LDAP_USERNAME_END_STRING
-          - name: AUTH_LDAP_ROLE_ATTRIBUTE_ID
-          - name: AUTH_LDAP_ROLES_CTX_DN
-          - name: AUTH_LDAP_ROLE_FILTER
-          - name: AUTH_LDAP_ROLE_RECURSION
-          - name: AUTH_LDAP_DEFAULT_ROLE
-          - name: AUTH_LDAP_ROLE_NAME_ATTRIBUTE_ID
-          - name: AUTH_LDAP_PARSE_ROLE_NAME_FROM_DN
-          - name: AUTH_LDAP_ROLE_ATTRIBUTE_IS_DN
-          - name: AUTH_LDAP_REFERRAL_USER_ATTRIBUTE_ID_TO_CHECK
-          image: 172.30.1.1:5000/openshift/rhpam71-businesscentral-openshift@sha256:0cb3629c3836694abbeca05a1ebae69460303bc9942c66d683bb9de36e83f99d
-          imagePullPolicy: Always
-          livenessProbe:
-            exec:
-              command:
-              - /bin/bash
-              - -c
-              - curl --fail --silent -u 'adminUser:uKAjVo2!' http://localhost:8080/kie-wb.jsp
-            failureThreshold: 3
-            initialDelaySeconds: 180
-            periodSeconds: 15
-            successThreshold: 1
-            timeoutSeconds: 2
-          name: authoring-rhpamcentr
-          ports:
-          - containerPort: 8778
-            name: jolokia
-            protocol: TCP
-          - containerPort: 8080
-            name: http
-            protocol: TCP
-          - containerPort: 8443
-            name: https
-            protocol: TCP
-          - containerPort: 8001
-            name: git-ssh
-            protocol: TCP
-          readinessProbe:
-            exec:
-              command:
-              - /bin/bash
-              - -c
-              - curl --fail --silent -u 'adminUser:uKAjVo2!' http://localhost:8080/kie-wb.jsp
-            failureThreshold: 6
-            initialDelaySeconds: 60
-            periodSeconds: 30
-            successThreshold: 1
-            timeoutSeconds: 2
-          resources:
-            limits:
-              memory: 2Gi
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /etc/businesscentral-secret-volume
-            name: businesscentral-keystore-volume
-            readOnly: true
-          - mountPath: /opt/eap/standalone/data/kie
-            name: authoring-rhpamcentr-pvol
-        dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        schedulerName: default-scheduler
-        securityContext: {}
-        serviceAccount: authoring-rhpamsvc
-        serviceAccountName: authoring-rhpamsvc
-        terminationGracePeriodSeconds: 60
-        volumes:
-        - name: businesscentral-keystore-volume
-          secret:
-            defaultMode: 420
-            secretName: businesscentral-app-secret
-        - name: authoring-rhpamcentr-pvol
-          persistentVolumeClaim:
-            claimName: authoring-rhpamcentr-claim
-    test: false
-    triggers:
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-        - authoring-rhpamcentr
-        from:
-          kind: ImageStreamTag
-          name: rhpam71-businesscentral-openshift:1.1
-          namespace: openshift
-      type: ImageChange
-    - type: ConfigChange
-  status:
-    availableReplicas: 0
-    latestVersion: 0
-    observedGeneration: 0
-    replicas: 0
-    unavailableReplicas: 0
-    updatedReplicas: 0
-- apiVersion: v1
-  kind: DeploymentConfig
-  metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftWebConsole
-    creationTimestamp: null
-    generation: 1
-    labels:
-      app: docker-mac-chrony
-    name: docker-mac-chrony
+      app: minishift-chrony
+    name: minishift-chrony
   spec:
     replicas: 1
     selector:
-      app: docker-mac-chrony
-      deploymentconfig: docker-mac-chrony
+      app: minishift-chrony
+      deploymentconfig: minishift-chrony
     strategy:
-      activeDeadlineSeconds: 21600
-      resources: {}
       rollingParams:
         intervalSeconds: 1
         maxSurge: 25%
@@ -506,18 +55,14 @@ objects:
       type: Rolling
     template:
       metadata:
-        annotations:
-          openshift.io/generated-by: OpenShiftWebConsole
-        creationTimestamp: null
         labels:
-          app: docker-mac-chrony
-          deploymentconfig: docker-mac-chrony
+          app: minishift-chrony
+          deploymentconfig: minishift-chrony
       spec:
         containers:
-        - image: 172.30.1.1:5000/rhpam/docker-mac-chrony@sha256:27cbc8f6c9964518e942e5db636e7adec69d4ea866160dbee388a9991cbb482e
+        - image: minishift-chrony:latest
           imagePullPolicy: Always
-          name: docker-mac-chrony
-          resources: {}
+          name: minishift-chrony
           securityContext:
             privileged: true
           terminationMessagePath: /dev/termination-log
@@ -525,10 +70,8 @@ objects:
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
-        securityContext:
-          seLinuxOptions: {}
-        serviceAccount: docker-mac-chrony
-        serviceAccountName: docker-mac-chrony
+        serviceAccount: minishift-chrony
+        serviceAccountName: minishift-chrony
         terminationGracePeriodSeconds: 30
     test: false
     triggers:
@@ -536,113 +79,14 @@ objects:
     - imageChangeParams:
         automatic: true
         containerNames:
-        - docker-mac-chrony
+        - minishift-chrony
         from:
           kind: ImageStreamTag
-          name: docker-mac-chrony:latest
-          namespace: rhpam
+          name: minishift-chrony:latest
       type: ImageChange
-  status:
-    availableReplicas: 0
-    latestVersion: 0
-    observedGeneration: 0
-    replicas: 0
-    unavailableReplicas: 0
-    updatedReplicas: 0
 - apiVersion: v1
-  kind: DeploymentConfig
+  kind: ServiceAccount
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftWebConsole
-    creationTimestamp: null
-    generation: 1
     labels:
-      app: rhel
-    name: rhel
-  spec:
-    replicas: 1
-    selector:
-      app: rhel
-      deploymentconfig: rhel
-    strategy:
-      activeDeadlineSeconds: 21600
-      resources: {}
-      rollingParams:
-        intervalSeconds: 1
-        maxSurge: 25%
-        maxUnavailable: 25%
-        timeoutSeconds: 600
-        updatePeriodSeconds: 1
-      type: Rolling
-    template:
-      metadata:
-        annotations:
-          openshift.io/generated-by: OpenShiftWebConsole
-        creationTimestamp: null
-        labels:
-          app: rhel
-          deploymentconfig: rhel
-      spec:
-        containers:
-        - image: registry.access.redhat.com/rhel7/rhel@sha256:2fb67122fa3a8e14565016865ca67402e00f055ba7dba6febd8999b650beef72
-          imagePullPolicy: Always
-          name: rhel
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-        dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        schedulerName: default-scheduler
-        securityContext: {}
-        terminationGracePeriodSeconds: 30
-    test: false
-    triggers:
-    - type: ConfigChange
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-        - rhel
-        from:
-          kind: ImageStreamTag
-          name: rhel:latest
-          namespace: openshift
-      type: ImageChange
-  status:
-    availableReplicas: 0
-    latestVersion: 0
-    observedGeneration: 0
-    replicas: 0
-    unavailableReplicas: 0
-    updatedReplicas: 0
-- apiVersion: v1
-  kind: ServiceAccount
-  metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
-    labels:
-      app: rhpam71-authoring
-      application: authoring
-      rhpam: "1.1"
-      template: rhpam71-authoring
-    name: authoring-rhpamsvc
-- apiVersion: v1
-  kind: ServiceAccount
-  metadata:
-    creationTimestamp: null
-    name: builder
-- apiVersion: v1
-  kind: ServiceAccount
-  metadata:
-    creationTimestamp: null
-    name: default
-- apiVersion: v1
-  kind: ServiceAccount
-  metadata:
-    creationTimestamp: null
-    name: deployer
-- apiVersion: v1
-  kind: ServiceAccount
-  metadata:
-    creationTimestamp: null
-    name: docker-mac-chrony
+      app: minishift-chrony
+    name: minishift-chrony
